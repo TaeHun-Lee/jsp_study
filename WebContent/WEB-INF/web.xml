@@ -2,17 +2,9 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
   <display-name>TeunoMarket</display-name>
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>main.jsp</welcome-file>
   </welcome-file-list>
   
-  <servlet>
-  	<servlet-name>teunoServlet</servlet-name>
-  	<servlet-class>com.servlet.TeunoServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-  	<servlet-name>teunoServlet</servlet-name>
-  	<url-pattern>/ts</url-pattern>
-  </servlet-mapping>
   <servlet>
   	<servlet-name>main</servlet-name>
   	<jsp-file>/main.jsp</jsp-file>
