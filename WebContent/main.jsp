@@ -14,21 +14,42 @@
 <link rel="icon" href="<%= getServletContext().getContextPath() %>/img/favicon.png" type="image/x-icon" />
 <style>
 	.main {
-	text-align: center;
+		text-align: center;
+	}
+	.form-container {
+		margin: 0 auto;
+		max-width: 25em;
+		transition: all .5s ease-in-out;
+		background: white;
+	  	padding: 1.5em;
+	  	border-radius: 1em;
+	  	box-shadow: 0px 0px 1em #ddd;
+	}
+	label { color: #d9534f ; }
+	button { 
+	    background: #008CBA;
+	    margin: .5em;
+	}
+	button:hover {
+		background: darken(#008CBA, 5%);
 	}
 </style>
 </head>
 <body>
 	<div class="container-fluid">
 	<%!
-		String userName = null;
-		String userEmail = null;
+		String userName;
+		String userEmail;
 	%>
 	<% 
 		TeunoDTO dto = (TeunoDTO)session.getAttribute("userObj");
 		if (dto != null) {
 			userName = dto.getUserName();
 			userEmail = dto.getUserEmail();
+		}
+		else {
+			userName = null;
+			userEmail = null;
 		}
 	%>
 	  <nav class="nav nav-pills nav-justified justify-content-center align-items-center">
@@ -38,8 +59,9 @@
 	    <a class="nav-item nav-link" href="#">Contact</a>
 	    <a class="nav-item nav-link" href="#">My Page</a>
 	  </nav>
-	  <div class="main">
+	  <div class="main form-container off-canvas">
 	  	<h1><%= userName %></h1>
+	  	
 	  </div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -68,42 +90,40 @@
 			});
 			$(myPage).click(function(e){
 				e.preventDefault();
-				<% if (userName == null) { %>
-					var formEl = $('<form method="POST">' +
-							'</form>');
-					var formGroupEl = $('<div class="form-group">' +
-						  '</div>');
+				<% if (dto == null) { %>
+					var formEl = $('<form method="POST"></form>');
+					var formGroupEl = $('<div class="form-group"></div>');
 					function createFormGroupEl(formGroupEl, labelName, inputType, inputName) {
-						var fgClone = formGroupEl.clone();
 						var labelEl = $('<label>' + labelName + '</label>');
-						var inputEl = $('<input class="form-control">');
+						var inputEl = $('<input class="form-control" aria-required="true" aria-invalid="true" required>');
 						inputEl.attr('type', inputType).attr('name', inputName);
-						labelEl.appendTo(fgClone);
-						inputEl.appendTo(fgClone);
-						return fgClone;
+						labelEl.appendTo(formGroupEl);
+						inputEl.appendTo(formGroupEl);
 					};
 					function createFormEl(formEl, formGroupEl, action, buttonText) {
-						var fClone = formEl.clone();
-						fClone.attr('action', action);
+						formEl.attr('action', action);
 						var button = $('<button type="submit" class="btn btn-primary">' + buttonText + '</button>');
-						formGroupEl.appendTo(fClone);
-						button.appendTo(fClone);
-						return fClone;
+						formGroupEl.appendTo(formEl);
+						button.appendTo(formEl);
 					};
-					var fg1 = createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
-					var fg2 = createFormGroupEl(fg1, 'Password', 'password', 'userPW');
-					var f1 = createFormEl(formEl, fg2, 'LoginOrLogout', '로그인');
-					main.html(f1);
+					var fClone = formEl.clone();
+					var fgClone = formGroupEl.clone();
+					createFormGroupEl(fgClone, 'ID', 'text', 'userID');
+					createFormGroupEl(fgClone, 'Password', 'password', 'userPW');
+					createFormEl(fClone, fgClone, 'LoginOrLogout', '로그인');
+					main.html(fClone);
 					var signUp = $('<button />', {
 						'class' : 'btn btn-primary',
 						text : '회원가입',
 						click : function(e){
 							e.preventDefault();
-							fg1 = createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
-							fg2 = createFormGroupEl(fg1, 'Password', 'password', 'userPW');
-							var fg3 = createFormGroupEl(fg2, 'Email', 'email', 'userEmail');
-							f1 = createFormEl(formEl, fg3, 'SignUp', '회원가입');
-							main.html(f1);
+							fClone = formEl.clone();
+							fgClone = formGroupEl.clone();
+							createFormGroupEl(fgClone, 'ID', 'text', 'userID');
+							createFormGroupEl(fgClone, 'Password', 'password', 'userPW');
+							createFormGroupEl(fgClone, 'Email', 'email', 'userEmail');
+							createFormEl(fClone, fgClone, 'SignUp', '회원가입');
+							main.html(fClone);
 						}
 					});
 					main.append(signUp);
