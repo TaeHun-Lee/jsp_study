@@ -59,9 +59,8 @@
 	    <a class="nav-item nav-link" href="#">Contact</a>
 	    <a class="nav-item nav-link" href="#">My Page</a>
 	  </nav>
-	  <div class="main form-container off-canvas">
-	  	<h1><%= userName %></h1>
-	  	
+	  <div class="main">
+
 	  </div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -90,9 +89,30 @@
 			});
 			$(myPage).click(function(e){
 				e.preventDefault();
+				var fContainer = $('<div class="form-container off-canvas"></div>');
 				<% if (dto == null) { %>
+				
 					var formEl = $('<form method="POST"></form>');
 					var formGroupEl = $('<div class="form-group"></div>');
+					
+					var signUp = $('<button />', {
+						'class' : 'btn btn-primary',
+						text : '회원가입',
+						click : function(e){
+							e.preventDefault();
+							
+							formGroupEl.empty();
+							formEl.empty();
+							fContainer.empty();
+							createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
+							createFormGroupEl(formGroupEl, 'Password', 'password', 'userPW');
+							createFormGroupEl(formGroupEl, 'Email', 'email', 'userEmail');
+							createFormEl(formEl, formGroupEl, 'SignUp', '회원가입');
+							fContainer.append(formEl);
+							main.html(fContainer);
+						}
+					});
+					
 					function createFormGroupEl(formGroupEl, labelName, inputType, inputName) {
 						var labelEl = $('<label>' + labelName + '</label>');
 						var inputEl = $('<input class="form-control" aria-required="true" aria-invalid="true" required>');
@@ -106,33 +126,23 @@
 						formGroupEl.appendTo(formEl);
 						button.appendTo(formEl);
 					};
-					var fClone = formEl.clone();
-					var fgClone = formGroupEl.clone();
-					createFormGroupEl(fgClone, 'ID', 'text', 'userID');
-					createFormGroupEl(fgClone, 'Password', 'password', 'userPW');
-					createFormEl(fClone, fgClone, 'LoginOrLogout', '로그인');
-					main.html(fClone);
-					var signUp = $('<button />', {
-						'class' : 'btn btn-primary',
-						text : '회원가입',
-						click : function(e){
-							e.preventDefault();
-							fClone = formEl.clone();
-							fgClone = formGroupEl.clone();
-							createFormGroupEl(fgClone, 'ID', 'text', 'userID');
-							createFormGroupEl(fgClone, 'Password', 'password', 'userPW');
-							createFormGroupEl(fgClone, 'Email', 'email', 'userEmail');
-							createFormEl(fClone, fgClone, 'SignUp', '회원가입');
-							main.html(fClone);
-						}
-					});
-					main.append(signUp);
+				
+					createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
+					createFormGroupEl(formGroupEl, 'Password', 'password', 'userPW');
+					createFormEl(formEl, formGroupEl, 'LoginOrLogout', '로그인');
+					
+					fContainer.append(formEl);
+					fContainer.append(signUp);
+					main.html(fContainer);
+					
 				<% } else { %>
-					main.html('<h1>User ID : <%= userName %> </h1>' +
+					var acc = $('<h1>User ID : <%= userName %> </h1>' +
 							'<h1>User Email : <%= userEmail %> </h1>' +
 							'<form action="LoginOrLogout" method="POST">' +
 							  '<button type="submit" class="btn btn-primary">로그아웃</button>'+
 							'</form>');
+					fContainer.append(acc);
+					main.html(fContainer);
 				<% } %>
 			});
 		});

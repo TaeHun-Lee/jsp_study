@@ -60,6 +60,31 @@ public class TeunoDAO {
 		return true;
 	}
 	
+	public boolean checkUser(String userID, String userPW) {
+		String SQL = "select EXISTS (select * from user where user_name=? and user_password=?) as success";
+		try {
+			psmt = conn.prepareStatement(SQL);
+			psmt.setString(1, userID);
+			psmt.setString(2, userPW);
+			rslt = psmt.executeQuery();
+			rslt.first();
+			if(rslt.getInt("success") != 0) {
+				System.out.println("존재 여부 : " + rslt.getInt("success"));
+				return false;
+			}
+		} catch (SQLException e) {
+			System.out.println("체크 에러");
+			e.printStackTrace();
+		}
+		try {
+			psmt.close();
+			rslt.close();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
 	public boolean signUp(String userID, String userPW, String userEmail) {
 		if (!checkUserExistence(userID) ) {
 			System.out.println("유저존재");
@@ -83,8 +108,11 @@ public class TeunoDAO {
 		return true;
 	}
 	
-	public TeunoDTO selectUser(String userID, String userPW) {
-		
+	public TeunoDTO signIn(String userID, String userPW) {
+		if (checkUser(userID, userPW) ) {
+			System.out.println("불합당유저");
+			return null;
+		}
 		String SQL = "SELECT user_name, user_email FROM user WHERE user_name=? AND user_password=?";
 		TeunoDTO dto = new TeunoDTO();
 		try {

@@ -24,7 +24,7 @@ public class LoginOrLogout extends HttpServlet {
 			String userID = request.getParameter("userID");
 			String userPW = request.getParameter("userPW");
 			TeunoDAO dao = new TeunoDAO();
-			dto = dao.selectUser(userID, userPW);
+			dto = dao.signIn(userID, userPW);
 			session.setAttribute("userObj", dto);
 			dao.disConnect();
 		} else {
