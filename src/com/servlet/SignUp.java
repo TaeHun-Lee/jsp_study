@@ -17,10 +17,13 @@ public class SignUp extends HttpServlet {
     }
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		TeunoDAO dao = new TeunoDAO();
+		HttpSession session = request.getSession();
 		String userID = request.getParameter("userID");
 		String userPW = request.getParameter("userPW");
 		String userEmail = request.getParameter("userEmail");
 		dao.signUp(userID, userPW, userEmail);
+		TeunoDTO dto = dao.signIn(userID, userPW);
+		session.setAttribute("userObj", dto);
 		response.sendRedirect("main");
 		dao.disConnect();
 	}
