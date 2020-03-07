@@ -107,7 +107,7 @@
 							createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
 							createFormGroupEl(formGroupEl, 'Password', 'password', 'userPW');
 							createFormGroupEl(formGroupEl, 'Email', 'email', 'userEmail');
-							createFormEl(formEl, formGroupEl, 'SignUp', '회원가입');
+							createFormEl(formEl, formGroupEl, 'SignUp.do', '회원가입');
 							fContainer.append(formEl);
 							main.html(fContainer);
 						}
@@ -129,7 +129,7 @@
 				
 					createFormGroupEl(formGroupEl, 'ID', 'text', 'userID');
 					createFormGroupEl(formGroupEl, 'Password', 'password', 'userPW');
-					createFormEl(formEl, formGroupEl, 'LoginOrLogout', '로그인');
+					createFormEl(formEl, formGroupEl, 'LoginOrLogout.do', '로그인');
 					
 					fContainer.append(formEl);
 					fContainer.append(signUp);
@@ -138,7 +138,7 @@
 				<% } else { %>
 					var acc = $('<h1>User ID : <%= userName %> </h1>' +
 							'<h1>User Email : <%= userEmail %> </h1>' +
-							'<form action="LoginOrLogout" method="POST">' +
+							'<form action="LoginOrLogout.do" method="POST">' +
 							  '<button type="submit" class="btn btn-primary">로그아웃</button>'+
 							'</form>');
 					fContainer.append(acc);
