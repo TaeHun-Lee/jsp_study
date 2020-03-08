@@ -40,9 +40,11 @@
 	<%!
 		String userName;
 		String userEmail;
+		String msg;
 	%>
 	<% 
 		TeunoDTO dto = (TeunoDTO)session.getAttribute("userObj");
+		msg = (String)session.getAttribute("msg");
 		if (dto != null) {
 			userName = dto.getUserName();
 			userEmail = dto.getUserEmail();
@@ -60,7 +62,9 @@
 	    <a class="nav-item nav-link" href="#">My Page</a>
 	  </nav>
 	  <div class="main">
-
+		<%= (String)session.getAttribute("pName")  %>
+		<%= (String)session.getAttribute("date")  %>
+		<img src="upload/<%= (String)session.getAttribute("fName") %>" />
 	  </div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -75,6 +79,18 @@
 			var icon = navList[2];
 			var contact = navList[3];
 			var myPage = navList[4];
+			<% if (msg != null) { %>
+				switch("<%= msg %>"){
+				case "SignInError":
+					alert("로그인 실패");
+					<% session.removeAttribute("msg"); %>
+					break;
+				case "SignUpError":
+					alert("회원가입 실패");
+					<% session.removeAttribute("msg"); %>
+					break;
+				}
+			<% } %>
 			$(about).click(function(e){
 				e.preventDefault();
 				main.html("<h1>This is About Page</h1>");
@@ -133,7 +149,21 @@
 					
 					fContainer.append(formEl);
 					fContainer.append(signUp);
-					main.html(fContainer);
+				
+				<% } else if(userName.compareTo("admin") == 0 && userEmail.compareTo("admin@admin.com") == 0) { %>
+					var adminForm = $('<form action="adminUpload.do" method="POST" enctype="Multipart/form-data">' +
+							'<label>상품명</label>' +
+							'<input class="form-control" aria-required="true" aria-invalid="true" type="text" name="productName" required>' +
+							'<label>사진</label>' +
+							'<input class="form-control" aria-required="true" aria-invalid="true" type="file" name="picture" required>' +
+							'<input type="hidden" name="uploadDate" id="uploadDate" value="' + new Date().toLocaleString() + '">' +
+							'<button type="submit" class="btn btn-primary">상품 업로드</button>'+
+						'</form>');
+					var logOut = $('<form action="LoginOrLogout.do" method="POST">' +
+							  '<button type="submit" class="btn btn-primary">로그아웃</button>'+
+								'</form>');
+					fContainer.append(adminForm);
+					fContainer.append(logOut);
 					
 				<% } else { %>
 					var acc = $('<h1>User ID : <%= userName %> </h1>' +
@@ -142,8 +172,8 @@
 							  '<button type="submit" class="btn btn-primary">로그아웃</button>'+
 							'</form>');
 					fContainer.append(acc);
-					main.html(fContainer);
 				<% } %>
+				main.html(fContainer);
 			});
 		});
 	</script>
