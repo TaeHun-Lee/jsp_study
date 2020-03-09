@@ -2,7 +2,9 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
 <%@ page import="javax.servlet.*" %>
-<%@ page import="com.servlet.TeunoDTO" %>
+<%@ page import="com.servlet.UserDTO" %>
+<%@ page import="com.servlet.ProductDTO" %>
+<%@ page import="com.servlet.TeunoDAO" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,9 +20,7 @@
 	}
 	.form-container {
 		margin: 0 auto;
-		max-width: 25em;
 		transition: all .5s ease-in-out;
-		background: white;
 	  	padding: 1.5em;
 	  	border-radius: 1em;
 	  	box-shadow: 0px 0px 1em #ddd;
@@ -38,12 +38,15 @@
 <body>
 	<div class="container-fluid">
 	<%!
+		TeunoDAO dao;
 		String userName;
 		String userEmail;
 		String msg;
 	%>
-	<% 
-		TeunoDTO dto = (TeunoDTO)session.getAttribute("userObj");
+	<%
+		dao = new TeunoDAO();
+		ArrayList<ProductDTO> pList = dao.selectProductAll();
+		UserDTO dto = (UserDTO)session.getAttribute("userObj");
 		msg = (String)session.getAttribute("msg");
 		if (dto != null) {
 			userName = dto.getUserName();
@@ -61,10 +64,21 @@
 	    <a class="nav-item nav-link" href="#">Contact</a>
 	    <a class="nav-item nav-link" href="#">My Page</a>
 	  </nav>
-	  <div class="main">
-		<%= (String)session.getAttribute("pName")  %>
-		<%= (String)session.getAttribute("date")  %>
-		<img src="upload/<%= (String)session.getAttribute("fName") %>" />
+	  <div class="main row">
+	  	<div class="card-deck row">
+	  		<% for(int i=0; i<pList.size(); i++) { %>
+	  		<div class="col-sm-3">
+			  <div class="card">
+			    <img src="upload/<%= pList.get(i).getProduct_picture() %>" class="card-img-top" alt="상품 사진">
+			    <div class="card-body">
+			      <h5 class="card-title"><%= pList.get(i).getPruduct_name() %></h5>
+			      <p class="card-text"><%= pList.get(i).getProduct_desc() %></p>
+			      <p class="card-text"><small class="text-muted"><%= pList.get(i).getUpload_date() %></small></p>
+			    </div>
+			  </div>
+			</div>
+			<% } %>
+		</div>
 	  </div>
 	</div>
 	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -74,6 +88,7 @@
 		$(document).ready(function(){
 			var navList = $(".nav-link");
 			var main = $(".main");
+			var main_bu = main.children();
 			var about = navList[0];
 			var product = navList[1];
 			var icon = navList[2];
@@ -99,13 +114,17 @@
 				e.preventDefault();
 				main.html("<h1>This is Product Page</h1>");
 			});
+			$(icon).click(function(e){
+				e.preventDefault();
+				main.html(main_bu);
+			});
 			$(contact).click(function(e){
 				e.preventDefault();
 				main.html("<h1>This is Contact Page</h1>");
 			});
 			$(myPage).click(function(e){
 				e.preventDefault();
-				var fContainer = $('<div class="form-container off-canvas"></div>');
+				var fContainer = $('<div class="form-container col-6"></div>');
 				<% if (dto == null) { %>
 				
 					var formEl = $('<form method="POST"></form>');
@@ -151,18 +170,58 @@
 					fContainer.append(signUp);
 				
 				<% } else if(userName.compareTo("admin") == 0 && userEmail.compareTo("admin@admin.com") == 0) { %>
-					var adminForm = $('<form action="adminUpload.do" method="POST" enctype="Multipart/form-data">' +
-							'<label>상품명</label>' +
-							'<input class="form-control" aria-required="true" aria-invalid="true" type="text" name="productName" required>' +
-							'<label>사진</label>' +
-							'<input class="form-control" aria-required="true" aria-invalid="true" type="file" name="picture" required>' +
-							'<input type="hidden" name="uploadDate" id="uploadDate" value="' + new Date().toLocaleString() + '">' +
-							'<button type="submit" class="btn btn-primary">상품 업로드</button>'+
-						'</form>');
+					<%! ArrayList<UserDTO> list; %>
+					<% list = dao.selectAll(); %>
+					var board = $('<h1>관리자 영역</h1>'+
+					'<div class="table-responsive">'+
+					'<table class="table">'+
+					  '<thead class="thead-dark">'+
+					    '<tr>'+
+					      '<th scope="col"></th>'+
+					      '<th scope="col">User Name</th>'+
+					      '<th scope="col">User Email</th>'+
+					      '<th scope="col">Action</th>'+
+					    '</tr>'+
+					  '</thead>'+
+					  '<tbody>'+
+					  	<% for(int i=0; i<list.size(); i++) { %>
+					    '<tr>'+
+					      '<th scope="row"><%= i+1 %></th>'+
+					      '<td><%= list.get(i).getUserName() %></td>'+
+					      '<td><%= list.get(i).getUserEmail()%></td>'+
+					      '<td><form action="deleteUser.do" method="POST">'+
+					      '<input type="hidden" name="userName" value="<%= list.get(i).getUserName() %>">'+
+					      '<input type="hidden" name="userEmail" value="<%= list.get(i).getUserEmail()%>">'+
+					      '<button type="submit" class="btn btn-primary">유저 삭제</button></form></td>'+
+					    '</tr>'+
+					    <% } %>
+					  '</tbody>'+
+					'</table>'+
+					'</div>');
+					var uploadButton = $('<button />', {
+						'class' : 'btn btn-primary',
+						text : '상품 업로드',
+						click : function(e){
+							e.preventDefault();
+							var adminForm = $('<form action="adminUpload.do" method="POST" enctype="Multipart/form-data">' +
+									'<label>상품명</label>' +
+									'<input class="form-control" aria-required="true" aria-invalid="true" type="text" name="productName" required>' +
+									'<label>사진</label>' +
+									'<input class="form-control" aria-required="true" aria-invalid="true" type="file" name="picture" required>' +
+									'<label>상품 설명</label>' +
+									'<input class="form-control" aria-required="true" aria-invalid="true" type="text" name="productDesc" required>' +
+									'<input type="hidden" name="uploadDate" id="uploadDate" value="' + new Date().toLocaleString() + '">' +
+									'<button type="submit" class="btn btn-primary">업로드</button>'+
+								'</form>');
+							this.remove();
+							fContainer.append(adminForm);
+						}
+					});
 					var logOut = $('<form action="LoginOrLogout.do" method="POST">' +
 							  '<button type="submit" class="btn btn-primary">로그아웃</button>'+
 								'</form>');
-					fContainer.append(adminForm);
+					fContainer.append(board);
+					fContainer.append(uploadButton);
 					fContainer.append(logOut);
 					
 				<% } else { %>

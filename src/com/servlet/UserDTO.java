@@ -1,6 +1,6 @@
 package com.servlet;
 
-public class TeunoDTO {
+public class UserDTO {
 	private String userName;
 	private String userEmail;
 	public String getUserName() {
