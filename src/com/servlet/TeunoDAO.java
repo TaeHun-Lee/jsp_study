@@ -43,7 +43,6 @@ public class TeunoDAO {
 			rslt = psmt.executeQuery();
 			rslt.first();
 			if(rslt.getInt("success") != 0) {
-				System.out.println("존재 여부 : " + rslt.getInt("success"));
 				return false;
 			}
 		} catch (SQLException e) {
@@ -69,7 +68,6 @@ public class TeunoDAO {
 			rslt = psmt.executeQuery();
 			rslt.first();
 			if(rslt.getInt("success") != 0) {
-				System.out.println("존재 여부 : " + rslt.getInt("success"));
 				return false;
 			}
 		} catch (SQLException e) {
@@ -187,7 +185,7 @@ public class TeunoDAO {
 	}
 	
 	public boolean insertProduct(String product_name, String product_desc, String product_picture, String upload_date) {
-		String SQL = "INSERT INTO product VALUES(?, ?, ?, ?)";
+		String SQL = "INSERT INTO product(product_name, product_desc, picture_src, upload_date) VALUES(?, ?, ?, ?)";
 		try {
 			psmt = conn.prepareStatement(SQL);
 			psmt.setString(1, product_name);
@@ -209,6 +207,34 @@ public class TeunoDAO {
 		return true;
 	}
 	
+	public ProductDTO selectProduct(String product_id) {
+		ProductDTO dto = null;
+		String SQL = "SELECT product_name, product_desc, picture_src, upload_date FROM product WHERE product_id=?";
+		try {
+			int pId = Integer.parseInt(product_id);
+			psmt = conn.prepareStatement(SQL);
+			psmt.setInt(1, pId);
+			rslt = psmt.executeQuery();
+			while(rslt.next()) {
+				dto = new ProductDTO();
+				dto.setPruduct_name(rslt.getString(1));
+				dto.setProduct_desc(rslt.getString(2));
+				dto.setProduct_picture(rslt.getString(3));
+				dto.setUpload_date(rslt.getString(4));
+			}
+		} catch (SQLException e) {
+			System.out.println("상품 셀렉트 에러");
+			e.printStackTrace();
+		}
+		try {
+			rslt.close();
+			psmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return dto;
+	}
+	
 	public ArrayList<ProductDTO> selectProductAll(){
 		ArrayList<ProductDTO> list = null;
 		String SQL = "SELECT * FROM product";
@@ -218,10 +244,11 @@ public class TeunoDAO {
 			rslt = psmt.executeQuery();
 			while(rslt.next()) {
 				ProductDTO dto = new ProductDTO();
-				dto.setPruduct_name(rslt.getString(1));
-				dto.setProduct_desc(rslt.getString(2));
-				dto.setProduct_picture(rslt.getString(3));
-				dto.setUpload_date(rslt.getString(4));
+				dto.setProduct_id(rslt.getInt(1));
+				dto.setPruduct_name(rslt.getString(2));
+				dto.setProduct_desc(rslt.getString(3));
+				dto.setProduct_picture(rslt.getString(4));
+				dto.setUpload_date(rslt.getString(5));
 				list.add(dto);
 			}
 		} catch (SQLException e) {
@@ -237,12 +264,11 @@ public class TeunoDAO {
 		return list;
 	}
 	
-	public boolean deleteProduct(String productName, String uploadDate) {
-		String SQL = "DELETE FROM product WHERE product_name=? AND upload_date=?";
+	public boolean deleteProduct(int product_id) {
+		String SQL = "DELETE FROM product WHERE product_id=?";
 		try {
 			psmt = conn.prepareStatement(SQL);
-			psmt.setString(1, productName);
-			psmt.setString(2, uploadDate);
+			psmt.setInt(1, product_id);
 			if(!psmt.execute()) return false;
 		} catch (SQLException e) {
 			System.out.println("상품 딜리트 에러");

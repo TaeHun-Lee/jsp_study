@@ -3,3 +3,25 @@
 .main {
 	text-align: center;
 }
+.form-container {
+	margin: 0 auto;
+	transition: all .5s ease-in-out;
+  	padding: 1.5em;
+  	border-radius: 1em;
+  	box-shadow: 0px 0px 1em #ddd;
+}
+.cartBoard {
+	margin: 1.5em;
+	transition: all .5s ease-in-out;
+  	padding: 1.5em;
+  	border-radius: 1em;
+  	box-shadow: 0px 0px 1em #ddd;
+}
+label { color: #d9534f ; }
+button { 
+    background: #008CBA;
+    margin: .5em;
+}
+button:hover {
+	background: darken(#008CBA, 5%);
+}

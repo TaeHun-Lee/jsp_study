@@ -1,11 +1,18 @@
 package com.servlet;
 
 public class ProductDTO {
+	private int product_id;
 	private String pruduct_name;
 	private String product_desc;
 	private String product_picture;
 	private String upload_date;
-
+	
+	public int getProduct_id() {
+		return product_id;
+	}
+	public void setProduct_id(int product_id) {
+		this.product_id = product_id;
+	}
 	public String getPruduct_name() {
 		return pruduct_name;
 	}

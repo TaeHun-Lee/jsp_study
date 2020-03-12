@@ -1,8 +1,12 @@
 package com.servlet;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,11 +30,10 @@ public class TeunoController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		url = request.getRequestURI().split("/TeunoMarket/")[1];
 		session = request.getSession();
-		System.out.println(url);
 		if(url.compareTo("LoginOrLogout.do") == 0) {
-			System.out.println("로그인올로그아웃");
 			dto = (UserDTO)session.getAttribute("userObj");
 			if (dto == null) {
+				System.out.println("로그인");
 				dao = new TeunoDAO();
 				String userID = request.getParameter("userID");
 				String userPW = request.getParameter("userPW");
@@ -44,6 +47,18 @@ public class TeunoController extends HttpServlet {
 				}
 				dao.disConnect();
 			} else {
+				System.out.println("로그아웃");
+				Cookie[] cookies = request.getCookies();
+				if(cookies != null) {
+					for(Cookie c : cookies) {
+						String name = URLDecoder.decode(c.getName(), "UTF-8");
+						if (name.equals("productId")){
+							c.setMaxAge(0);
+							System.out.println("쿠키 삭제 : " + name);
+							response.addCookie(c);
+						}
+					}
+				}
 				session.removeAttribute("userObj");
 			}
 		}
@@ -92,6 +107,14 @@ public class TeunoController extends HttpServlet {
 				session.setAttribute("AdminMsg", "DeleteError");
 			}
 			dao.disConnect();
+		}
+		else if (url.compareTo("putInCart.do") == 0) {
+			System.out.println("장바구니");
+			String pId = request.getParameter("pId");
+			System.out.println("쿠키 값 : " + pId);
+			Cookie pIdC = new Cookie("productId", URLEncoder.encode(pId, "UTF-8"));
+			pIdC.setMaxAge(10 * 60 * 60);
+			response.addCookie(pIdC);
 		}
 		response.sendRedirect("main");
 	}
